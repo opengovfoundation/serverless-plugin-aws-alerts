@@ -310,6 +310,11 @@ class AlertsPlugin {
       return;
     }
 
+    if (!config.enabled) {
+      this.serverless.cli.log(`Not deploying alerts on stage ${this.options.stage}`);
+      return;
+    }
+
     if (config.stages && !_.includes(config.stages, this.options.stage)) {
       this.serverless.cli.log(`Warning: Not deploying alerts on stage ${this.options.stage}`);
       return;
