@@ -160,18 +160,24 @@ class AlertsPlugin {
         const topic = isTopicConfigAnObject ? topicConfig.topic : topicConfig;
         const notifications = isTopicConfigAnObject ? topicConfig.notifications : [];
 
-        if (topic) {
-          if (topic.indexOf('arn:') === 0) {
-            alertTopics[key] = topic;
-          } else {
-            const cfRef = `AwsAlerts${_.upperFirst(key)}`;
-            alertTopics[key] = {
-              Ref: cfRef
-            };
+        const isTopicAString = _.isString(topic)
 
-            this.addCfResources({
-              [cfRef]: this.getSnsTopicCloudFormation(topic, notifications),
-            });
+        if (topic) {
+          if (isTopicAString) {
+            if (topic.indexOf('arn:') === 0) {
+              alertTopics[key] = topic;
+            } else {
+              const cfRef = `AwsAlerts${_.upperFirst(key)}`;
+              alertTopics[key] = {
+                Ref: cfRef
+              };
+
+              this.addCfResources({
+                [cfRef]: this.getSnsTopicCloudFormation(topic, notifications),
+              });
+            }
+          } else {
+            alertTopics[key] = topic;
           }
         }
       });
