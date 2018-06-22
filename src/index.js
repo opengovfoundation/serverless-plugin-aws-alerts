@@ -232,6 +232,12 @@ class AlertsPlugin {
     const globalAlarms = this.getGlobalAlarms(config, definitions);
 
     this.serverless.service.getAllFunctions().forEach((functionName) => {
+      if (config.exclude) {
+        if (new RegExp(config.exclude).test(functionName)) {
+          return;
+        }
+      }
+
       const functionObj = this.serverless.service.getFunction(functionName);
 
       const normalizedFunctionName = this.providerNaming.getLambdaLogicalId(functionName);
