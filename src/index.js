@@ -22,15 +22,15 @@ class AlertsPlugin {
     };
   }
 
-  getConfig() {
+  getConfig () {
     return this.serverless.service.custom.alerts;
   }
 
-  getDefinitions(config) {
+  getDefinitions (config) {
     return _.merge({}, defaultDefinitions, config.definitions);
   }
 
-  getAlarms(alarms, definitions) {
+  getAlarms (alarms, definitions) {
     if (!alarms) return [];
 
     return alarms.reduce((result, alarm) => {
@@ -52,7 +52,7 @@ class AlertsPlugin {
     }, []);
   }
 
-  getGlobalAlarms(config, definitions) {
+  getGlobalAlarms (config, definitions) {
     if (!config) throw new Error('Missing config argument');
     if (!definitions) throw new Error('Missing definitions argument');
 
@@ -61,7 +61,7 @@ class AlertsPlugin {
     return this.getAlarms(alarms, definitions);
   }
 
-  getFunctionAlarms(functionObj, config, definitions) {
+  getFunctionAlarms (functionObj, config, definitions) {
     if (!config) throw new Error('Missing config argument');
     if (!definitions) throw new Error('Missing definitions argument');
 
@@ -69,7 +69,7 @@ class AlertsPlugin {
     return this.getAlarms(alarms, definitions);
   }
 
-  getAlarmCloudFormation(alertTopics, definition, functionRef) {
+  getAlarmCloudFormation (alertTopics, definition, functionRef) {
     if (!functionRef) {
       return;
     }
@@ -125,7 +125,7 @@ class AlertsPlugin {
       }
     };
 
-    const statisticValues = [ 'SampleCount', 'Average', 'Sum', 'Minimum', 'Maximum'];
+    const statisticValues = ['SampleCount', 'Average', 'Sum', 'Minimum', 'Maximum'];
     if (_.includes(statisticValues, definition.statistic)) {
       alarm.Properties.Statistic = definition.statistic
     } else {
@@ -134,7 +134,7 @@ class AlertsPlugin {
     return alarm;
   }
 
-  getSnsTopicCloudFormation(topicName, notifications) {
+  getSnsTopicCloudFormation (topicName, notifications) {
     const subscription = (notifications || []).map((n) => ({
       Protocol: n.protocol,
       Endpoint: n.endpoint
@@ -149,7 +149,7 @@ class AlertsPlugin {
     };
   }
 
-  compileAlertTopics(config) {
+  compileAlertTopics (config) {
     const alertTopics = {};
 
     if (config.topics) {
@@ -180,7 +180,7 @@ class AlertsPlugin {
     return alertTopics;
   }
 
-  getLogMetricCloudFormation(alarm, functionName, normalizedFunctionName, functionObj) {
+  getLogMetricCloudFormation (alarm, functionName, normalizedFunctionName, functionObj) {
     if (!alarm.pattern) return {};
 
     const logMetricCFRefBase = this.naming.getLogMetricCloudFormationRef(normalizedFunctionName, alarm.name);
@@ -222,7 +222,7 @@ class AlertsPlugin {
     };
   }
 
-  compileAlarms(config, definitions, alertTopics) {
+  compileAlarms (config, definitions, alertTopics) {
     const globalAlarms = this.getGlobalAlarms(config, definitions);
 
     this.serverless.service.getAllFunctions().forEach((functionName) => {
@@ -249,7 +249,7 @@ class AlertsPlugin {
     });
   }
 
-  getDashboardTemplates(configDashboards) {
+  getDashboardTemplates (configDashboards) {
     const configType = typeof configDashboards;
 
     if (configType === 'boolean') {
@@ -261,7 +261,7 @@ class AlertsPlugin {
     }
   }
 
-  compileDashboards(configDashboards) {
+  compileDashboards (configDashboards) {
     const service = this.serverless.service;
     const provider = service.provider;
     const stage = this.options.stage;
@@ -269,12 +269,12 @@ class AlertsPlugin {
     const dashboardTemplates = this.getDashboardTemplates(configDashboards);
 
     const functions = this.serverless.service
-                          .getAllFunctions()
-                          .map(functionName => ({ name: functionName }));
+      .getAllFunctions()
+      .map(functionName => ({ name: functionName }));
 
     const cf = _.chain(dashboardTemplates)
       .uniq()
-      .reduce( (acc, d) => {
+      .reduce((acc, d) => {
         const dashboard = dashboards.createDashboard(service.service, stage, region, functions, d);
 
         const cfResource = d === 'default'
@@ -297,7 +297,7 @@ class AlertsPlugin {
     this.addCfResources(cf);
   }
 
-  compile() {
+  compile () {
     const config = this.getConfig();
     if (!config) {
       // TODO warn no config
@@ -319,7 +319,7 @@ class AlertsPlugin {
     }
   }
 
-  addCfResources(resources) {
+  addCfResources (resources) {
     _.merge(this.serverless.service.provider.compiledCloudFormationTemplate.Resources, resources);
   }
 }
